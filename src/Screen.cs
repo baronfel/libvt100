@@ -3,27 +3,23 @@ using System.Drawing;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using SkiaSharp;
 
-namespace libvt100
-{
-    public class Screen : IAnsiDecoderClient, IEnumerable<Screen.Character>
-    {
-        public enum Blink
-        {
+namespace libvt100 {
+    public class Screen : IAnsiDecoderClient, IEnumerable<Screen.Character> {
+        public enum Blink {
             None,
             Slow,
             Rapid,
         }
 
-        public enum Underline
-        {
+        public enum Underline {
             None,
             Single,
             Double,
         }
 
-        public enum TextColor
-        {
+        public enum TextColor {
             Black,
             Red,
             Green,
@@ -43,8 +39,7 @@ namespace libvt100
             Rgb
         }
 
-        public struct GraphicAttributes
-        {
+        public struct GraphicAttributes {
             private bool m_bold;
             private bool m_faint;
             private bool m_italic;
@@ -56,138 +51,106 @@ namespace libvt100
             private Color m_foregroundRgb;
             private Color m_backgroundRgb;
 
-            public bool Bold
-            {
-                get
-                {
+            public bool Bold {
+                get {
                     return m_bold;
                 }
-                set
-                {
+                set {
                     m_bold = value;
                 }
             }
 
-            public bool Faint
-            {
-                get
-                {
+            public bool Faint {
+                get {
                     return m_faint;
                 }
-                set
-                {
+                set {
                     m_faint = value;
                 }
             }
 
-            public bool Italic
-            {
-                get
-                {
+            public bool Italic {
+                get {
                     return m_italic;
                 }
-                set
-                {
+                set {
                     m_italic = value;
                 }
             }
 
-            public Underline Underline
-            {
-                get
-                {
+            public Underline Underline {
+                get {
                     return m_underline;
                 }
-                set
-                {
+                set {
                     m_underline = value;
                 }
             }
 
-            public Blink Blink
-            {
-                get
-                {
+            public Blink Blink {
+                get {
                     return m_blink;
                 }
-                set
-                {
+                set {
                     m_blink = value;
                 }
             }
 
-            public bool Conceal
-            {
-                get
-                {
+            public bool Conceal {
+                get {
                     return m_conceal;
                 }
-                set
-                {
+                set {
                     m_conceal = value;
                 }
             }
 
-            public TextColor Foreground
-            {
-                get
-                {
+            public TextColor Foreground {
+                get {
                     return m_foreground;
                 }
-                set
-                {
+                set {
                     m_foreground = value;
                 }
             }
 
-            public TextColor Background
-            {
-                get
-                {
+            public TextColor Background {
+                get {
                     return m_background;
                 }
-                set
-                {
+                set {
                     m_background = value;
                 }
             }
 
-            public Color ForegroundColor
-            {
-                get
-                {
+            public Color ForegroundColor {
+                get {
                     if (Foreground == TextColor.Rgb)
                         return m_foregroundRgb;
                     else
                         return TextColorToColor(Foreground);
                 }
-                set
-                {
+                set {
                     Foreground = TextColor.Rgb;
                     m_foregroundRgb = value;
                 }
             }
 
-            public Color BackgroundColor
-            {
-                get
-                {
+            public Color BackgroundColor {
+                get {
                     if (Background == TextColor.Rgb)
                         return m_backgroundRgb;
                     else
                         return TextColorToColor(Background);
                 }
-                set
-                {
+                set {
                     Background = TextColor.Rgb;
                     m_backgroundRgb = value;
                 }
             }
 
-            public Color TextColorToColor(TextColor _textColor)
-            {
-                switch (_textColor)
-                {
+            public Color TextColorToColor(TextColor _textColor) {
+                switch (_textColor) {
                     case TextColor.Black:
                         return Color.Black;
                     case TextColor.Red:
@@ -225,8 +188,7 @@ namespace libvt100
                 //return Color.Transparent;
             }
 
-            public void Reset()
-            {
+            public void Reset() {
                 m_bold = false;
                 m_faint = false;
                 m_italic = false;
@@ -240,42 +202,33 @@ namespace libvt100
             }
         }
 
-        public class Character
-        {
+        public class Character {
             private char m_char;
             private GraphicAttributes m_graphicAttributes;
 
-            public char Char
-            {
-                get
-                {
+            public char Char {
+                get {
                     return m_char;
                 }
-                set
-                {
+                set {
                     m_char = value;
                 }
             }
 
-            public GraphicAttributes Attributes
-            {
-                get
-                {
+            public GraphicAttributes Attributes {
+                get {
                     return m_graphicAttributes;
                 }
-                set
-                {
+                set {
                     m_graphicAttributes = value;
                 }
             }
 
             public Character()
-                : this(' ')
-            {
+                : this(' ') {
             }
 
-            public Character(char _char)
-            {
+            public Character(char _char) {
                 m_char = _char;
                 m_graphicAttributes = new GraphicAttributes();
             }
@@ -288,21 +241,15 @@ namespace libvt100
         protected Character[,] m_screen;
         protected GraphicAttributes m_currentAttributes;
 
-        public Size Size
-        {
-            get
-            {
+        public Size Size {
+            get {
                 return new Size(Width, Height);
             }
-            set
-            {
-                if (m_screen == null || value.Width != Width || value.Height != Height)
-                {
+            set {
+                if (m_screen == null || value.Width != Width || value.Height != Height) {
                     m_screen = new Character[value.Width, value.Height];
-                    for (int x = 0; x < Width; ++x)
-                    {
-                        for (int y = 0; y < Height; ++y)
-                        {
+                    for (int x = 0; x < Width; ++x) {
+                        for (int y = 0; y < Height; ++y) {
                             this[x, y] = new Character();
                         }
                     }
@@ -311,32 +258,24 @@ namespace libvt100
             }
         }
 
-        public int Width
-        {
-            get
-            {
+        public int Width {
+            get {
                 return m_screen.GetLength(0);
             }
         }
 
-        public int Height
-        {
-            get
-            {
+        public int Height {
+            get {
                 return m_screen.GetLength(1);
             }
         }
 
-        public Point CursorPosition
-        {
-            get
-            {
+        public Point CursorPosition {
+            get {
                 return m_cursorPosition;
             }
-            set
-            {
-                if (m_cursorPosition != value)
-                {
+            set {
+                if (m_cursorPosition != value) {
                     CheckColumnRow(value.X, value.Y);
 
                     m_cursorPosition = value;
@@ -344,109 +283,84 @@ namespace libvt100
             }
         }
 
-        public Character this[int _column, int _row]
-        {
-            get
-            {
+        public Character this[int _column, int _row] {
+            get {
                 CheckColumnRow(_column, _row);
 
                 return m_screen[_column, _row];
             }
-            set
-            {
+            set {
                 CheckColumnRow(_column, _row);
 
                 m_screen[_column, _row] = value;
             }
         }
 
-        public Character this[Point _position]
-        {
-            get
-            {
+        public Character this[Point _position] {
+            get {
                 return this[_position.X, _position.Y];
             }
-            set
-            {
+            set {
                 this[_position.X, _position.Y] = value;
             }
         }
 
-        public Screen(int _width, int _height)
-        {
+        public Screen(int _width, int _height) {
             Size = new Size(_width, _height);
             m_showCursor = true;
             m_savedCursorPosition = Point.Empty;
             m_currentAttributes.Reset();
         }
 
-        protected void CheckColumnRow(int _column, int _row)
-        {
-            if (_column >= Width)
-            {
+        protected void CheckColumnRow(int _column, int _row) {
+            if (_column >= Width) {
                 throw new ArgumentOutOfRangeException(String.Format("The column number ({0}) is larger than the screen width ({1})", _column, Width));
             }
-            if (_row >= Height)
-            {
+            if (_row >= Height) {
                 throw new ArgumentOutOfRangeException(String.Format("The row number ({0}) is larger than the screen height ({1})", _row, Height));
             }
         }
 
-        public void CursorForward()
-        {
-            if (m_cursorPosition.X + 1 >= Width)
-            {
+        public void CursorForward() {
+            if (m_cursorPosition.X + 1 >= Width) {
                 CursorPosition = new Point(0, m_cursorPosition.Y + 1);
             }
-            else
-            {
+            else {
                 CursorPosition = new Point(m_cursorPosition.X + 1, m_cursorPosition.Y);
             }
         }
 
-        public void CursorBackward()
-        {
-            if (m_cursorPosition.X - 1 < 0)
-            {
+        public void CursorBackward() {
+            if (m_cursorPosition.X - 1 < 0) {
                 CursorPosition = new Point(Width - 1, m_cursorPosition.Y - 1);
             }
-            else
-            {
+            else {
                 CursorPosition = new Point(m_cursorPosition.X - 1, m_cursorPosition.Y);
             }
         }
 
-        public void CursorDown()
-        {
-            if (m_cursorPosition.Y + 1 >= Height)
-            {
+        public void CursorDown() {
+            if (m_cursorPosition.Y + 1 >= Height) {
                 throw new Exception("Can not move further down!");
             }
             CursorPosition = new Point(m_cursorPosition.X, m_cursorPosition.Y + 1);
         }
 
-        public void CursorUp()
-        {
-            if (m_cursorPosition.Y - 1 < 0)
-            {
+        public void CursorUp() {
+            if (m_cursorPosition.Y - 1 < 0) {
                 throw new Exception("Can not move further up!");
             }
             CursorPosition = new Point(m_cursorPosition.X, m_cursorPosition.Y - 1);
         }
 
-        public override String ToString()
-        {
+        public override String ToString() {
             StringBuilder builder = new StringBuilder();
-            for (int y = 0; y < Height; ++y)
-            {
-                for (int x = 0; x < Width; ++x)
-                {
-                    if (this[x, y].Char > 127)
-                    {
+            for (int y = 0; y < Height; ++y) {
+                for (int x = 0; x < Width; ++x) {
+                    if (this[x, y].Char > 127) {
                         builder.Append('!');
                     }
-                    else
-                    {
+                    else {
                         builder.Append(this[x, y].Char);
                     }
                 }
@@ -455,76 +369,83 @@ namespace libvt100
             return builder.ToString();
         }
 
-        public Bitmap ToBitmap(Font _font)
-        {
-            if (_font == null)
-            {
-                throw new ArgumentNullException("_font", "A font must be specified.");
+        public SKBitmap ToBitmap(SKTypeface typeface) {
+            if (typeface == null) {
+                throw new ArgumentNullException(nameof(typeface), "A font must be specified.");
             }
 
-            Bitmap bitmap = new Bitmap(_font.Height * Width, _font.Height * Height);
-            Graphics graphics = Graphics.FromImage(bitmap);
-            for (int y = 0; y < Height; ++y)
-            {
-                for (int x = 0; x < Width; ++x)
-                {
-                    Character character = this[x, y];
-                    Rectangle rect = new Rectangle(_font.Height * x, _font.Height * y, _font.Height, _font.Height);
-                    graphics.FillRectangle(new SolidBrush(character.Attributes.BackgroundColor), rect);
+            var font = typeface.ToFont();
+            font.GetFontMetrics(out var metrics);
+            var height = (int)metrics.XHeight;
+            var width = typeface.FontWidth;
+            SKBitmap bitmap = new SKBitmap(width * Width, height * Height);
+            using (var canvas = new SKCanvas(bitmap)) {
+                for (int y = 0; y < Height; ++y) {
+                    for (int x = 0; x < Width; ++x) {
+                        Character character = this[x, y];
+                        var textInsertPoint = new SKPoint(width * x, height * y);
+                        var textInsertSize = new SKSize(width, height);
+                        var rect = SKRect.Create(textInsertPoint, textInsertSize);
+                        var rectPaint = new SKPaint {
+                            Style = SKPaintStyle.Fill,
+                            Color = character.Attributes.BackgroundColor.ToSkiaColor()
+                        };
 
-                    Font font = _font;
-                    if (character.Attributes.Bold)
-                    {
-                        if (character.Attributes.Italic)
-                        {
-                            font = new Font(_font.FontFamily, _font.Size, FontStyle.Bold | FontStyle.Italic);
+                        canvas.DrawRect(rect, rectPaint);
+
+                        SKFontStyle fontStyle;
+
+                        if (character.Attributes.Bold) {
+                            if (character.Attributes.Italic) {
+                                fontStyle = SKFontStyle.BoldItalic;
+                            }
+                            else {
+                                fontStyle = SKFontStyle.Bold;
+                            }
                         }
-                        else
-                        {
-                            font = new Font(_font.FontFamily, _font.Size, FontStyle.Bold);
+                        else if (character.Attributes.Italic) {
+                            fontStyle = SKFontStyle.Italic;
                         }
+                        else {
+                            fontStyle = SKFontStyle.Normal;
+                        }
+
+                        SKTypeface styledTypeface = SKTypeface.FromFamilyName(font.Typeface.FamilyName, fontStyle);
+
+
+                        var textPaint = new SKPaint {
+                            Color = character.Attributes.ForegroundColor.ToSkiaColor(),
+                            Typeface = styledTypeface,
+                        };
+                        canvas.DrawText(new string(character.Char, 1), textInsertPoint, textPaint);
                     }
-                    else if (character.Attributes.Italic)
-                    {
-                        font = new Font(_font.FontFamily, _font.Size, FontStyle.Italic);
-                    }
-                    String text = new String(character.Char, 1);
-                    graphics.DrawString(text, font, new SolidBrush(character.Attributes.ForegroundColor), rect);
                 }
             }
+
             return bitmap;
         }
 
-        IEnumerator<Screen.Character> IEnumerable<Screen.Character>.GetEnumerator()
-        {
-            for (int y = 0; y < Height; ++y)
-            {
-                for (int x = 0; x < Width; ++x)
-                {
+        IEnumerator<Screen.Character> IEnumerable<Screen.Character>.GetEnumerator() {
+            for (int y = 0; y < Height; ++y) {
+                for (int x = 0; x < Width; ++x) {
                     yield return this[x, y];
                 }
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
+        IEnumerator IEnumerable.GetEnumerator() {
             return (this as IEnumerable<Screen.Character>).GetEnumerator();
         }
 
-        void IAnsiDecoderClient.Characters(IAnsiDecoder _sender, char[] _chars)
-        {
-            foreach (char ch in _chars)
-            {
-                if (ch == '\n')
-                {
+        void IAnsiDecoderClient.Characters(IAnsiDecoder _sender, char[] _chars) {
+            foreach (char ch in _chars) {
+                if (ch == '\n') {
                     (this as IAnsiDecoderClient).MoveCursorToBeginningOfLineBelow(_sender, 1);
                 }
-                else if (ch == '\r')
-                {
+                else if (ch == '\r') {
                     //(this as IVT100DecoderClient).MoveCursorToBeginningOfLineBelow ( _sender, 1 );
                 }
-                else
-                {
+                else {
                     this[CursorPosition].Char = ch;
                     this[CursorPosition].Attributes = m_currentAttributes;
                     CursorForward();
@@ -532,52 +453,43 @@ namespace libvt100
             }
         }
 
-        void IAnsiDecoderClient.SaveCursor(IAnsiDecoder _sernder)
-        {
+        void IAnsiDecoderClient.SaveCursor(IAnsiDecoder _sernder) {
             m_savedCursorPosition = m_cursorPosition;
         }
 
-        void IAnsiDecoderClient.RestoreCursor(IAnsiDecoder _sender)
-        {
+        void IAnsiDecoderClient.RestoreCursor(IAnsiDecoder _sender) {
             CursorPosition = m_savedCursorPosition;
         }
 
-        Size IAnsiDecoderClient.GetSize(IAnsiDecoder _sender)
-        {
+        Size IAnsiDecoderClient.GetSize(IAnsiDecoder _sender) {
             return Size;
         }
 
-        void IAnsiDecoderClient.MoveCursor(IAnsiDecoder _sender, Direction _direction, int _amount)
-        {
-            switch (_direction)
-            {
+        void IAnsiDecoderClient.MoveCursor(IAnsiDecoder _sender, Direction _direction, int _amount) {
+            switch (_direction) {
                 case Direction.Up:
-                    while (_amount > 0)
-                    {
+                    while (_amount > 0) {
                         CursorUp();
                         _amount--;
                     }
                     break;
 
                 case Direction.Down:
-                    while (_amount > 0)
-                    {
+                    while (_amount > 0) {
                         CursorDown();
                         _amount--;
                     }
                     break;
 
                 case Direction.Forward:
-                    while (_amount > 0)
-                    {
+                    while (_amount > 0) {
                         CursorForward();
                         _amount--;
                     }
                     break;
 
                 case Direction.Backward:
-                    while (_amount > 0)
-                    {
+                    while (_amount > 0) {
                         CursorBackward();
                         _amount--;
                     }
@@ -585,83 +497,67 @@ namespace libvt100
             }
         }
 
-        void IAnsiDecoderClient.MoveCursorToBeginningOfLineBelow(IAnsiDecoder _sender, int _lineNumberRelativeToCurrentLine)
-        {
+        void IAnsiDecoderClient.MoveCursorToBeginningOfLineBelow(IAnsiDecoder _sender, int _lineNumberRelativeToCurrentLine) {
             m_cursorPosition.X = 0;
-            while (_lineNumberRelativeToCurrentLine > 0)
-            {
+            while (_lineNumberRelativeToCurrentLine > 0) {
                 CursorDown();
                 _lineNumberRelativeToCurrentLine--;
             }
         }
 
-        void IAnsiDecoderClient.MoveCursorToBeginningOfLineAbove(IAnsiDecoder _sender, int _lineNumberRelativeToCurrentLine)
-        {
+        void IAnsiDecoderClient.MoveCursorToBeginningOfLineAbove(IAnsiDecoder _sender, int _lineNumberRelativeToCurrentLine) {
             m_cursorPosition.X = 0;
-            while (_lineNumberRelativeToCurrentLine > 0)
-            {
+            while (_lineNumberRelativeToCurrentLine > 0) {
                 CursorUp();
                 _lineNumberRelativeToCurrentLine--;
             }
         }
 
-        void IAnsiDecoderClient.MoveCursorToColumn(IAnsiDecoder _sender, int _columnNumber)
-        {
+        void IAnsiDecoderClient.MoveCursorToColumn(IAnsiDecoder _sender, int _columnNumber) {
             CheckColumnRow(_columnNumber, m_cursorPosition.Y);
 
             CursorPosition = new Point(_columnNumber, m_cursorPosition.Y);
         }
 
-        void IAnsiDecoderClient.MoveCursorTo(IAnsiDecoder _sender, Point _position)
-        {
+        void IAnsiDecoderClient.MoveCursorTo(IAnsiDecoder _sender, Point _position) {
             CheckColumnRow(_position.X, _position.Y);
 
             CursorPosition = _position;
         }
 
-        void IAnsiDecoderClient.ClearScreen(IAnsiDecoder _sender, ClearDirection _direction)
-        {
+        void IAnsiDecoderClient.ClearScreen(IAnsiDecoder _sender, ClearDirection _direction) {
         }
 
-        void IAnsiDecoderClient.ClearLine(IAnsiDecoder _sender, ClearDirection _direction)
-        {
-            switch (_direction)
-            {
+        void IAnsiDecoderClient.ClearLine(IAnsiDecoder _sender, ClearDirection _direction) {
+            switch (_direction) {
                 case ClearDirection.Forward:
-                    for (int x = m_cursorPosition.X; x < Width; ++x)
-                    {
+                    for (int x = m_cursorPosition.X; x < Width; ++x) {
                         this[x, m_cursorPosition.Y].Char = ' ';
                     }
                     break;
 
                 case ClearDirection.Backward:
-                    for (int x = m_cursorPosition.X; x >= 0; --x)
-                    {
+                    for (int x = m_cursorPosition.X; x >= 0; --x) {
                         this[x, m_cursorPosition.Y].Char = ' ';
                     }
                     break;
 
                 case ClearDirection.Both:
-                    for (int x = 0; x < Width; ++x)
-                    {
+                    for (int x = 0; x < Width; ++x) {
                         this[x, m_cursorPosition.Y].Char = ' ';
                     }
                     break;
             }
         }
 
-        void IAnsiDecoderClient.ScrollPageUpwards(IAnsiDecoder _sender, int _linesToScroll)
-        {
+        void IAnsiDecoderClient.ScrollPageUpwards(IAnsiDecoder _sender, int _linesToScroll) {
         }
 
-        void IAnsiDecoderClient.ScrollPageDownwards(IAnsiDecoder _sender, int _linesToScroll)
-        {
+        void IAnsiDecoderClient.ScrollPageDownwards(IAnsiDecoder _sender, int _linesToScroll) {
         }
 
-        void IAnsiDecoderClient.ModeChanged(IAnsiDecoder _sender, AnsiMode _mode)
-        {
-            switch (_mode)
-            {
+        void IAnsiDecoderClient.ModeChanged(IAnsiDecoder _sender, AnsiMode _mode) {
+            switch (_mode) {
                 case AnsiMode.HideCursor:
                     m_showCursor = false;
                     break;
@@ -672,18 +568,14 @@ namespace libvt100
             }
         }
 
-        Point IAnsiDecoderClient.GetCursorPosition(IAnsiDecoder _sender)
-        {
+        Point IAnsiDecoderClient.GetCursorPosition(IAnsiDecoder _sender) {
             return new Point(m_cursorPosition.X + 1, m_cursorPosition.Y + 1);
         }
 
-        void IAnsiDecoderClient.SetGraphicRendition(IAnsiDecoder _sender, GraphicRendition[] _commands)
-        {
+        void IAnsiDecoderClient.SetGraphicRendition(IAnsiDecoder _sender, GraphicRendition[] _commands) {
             //foreach ( GraphicRendition command in _commands )
-            for (var i = 0; i < _commands.Length; i++)
-            {
-                switch (_commands[i])
-                {
+            for (var i = 0; i < _commands.Length; i++) {
+                switch (_commands[i]) {
                     case GraphicRendition.Reset:
                         m_currentAttributes.Reset();
                         break;
@@ -706,8 +598,7 @@ namespace libvt100
                         m_currentAttributes.Blink = Blink.Rapid;
                         break;
                     case GraphicRendition.Positive:
-                    case GraphicRendition.Inverse:
-                        {
+                    case GraphicRendition.Inverse: {
                             TextColor tmp = m_currentAttributes.Foreground;
                             m_currentAttributes.Foreground = m_currentAttributes.Background;
                             m_currentAttributes.Background = tmp;
@@ -870,9 +761,14 @@ namespace libvt100
             }
         }
 
-        void IDisposable.Dispose()
-        {
+        void IDisposable.Dispose() {
             m_screen = null;
+        }
+    }
+
+    public static class SkiaExtensions {
+        public static SKColor ToSkiaColor(this Color color) {
+            return new SKColor(color.R, color.G, color.B, color.A);
         }
     }
 }

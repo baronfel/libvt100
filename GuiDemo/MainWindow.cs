@@ -31,7 +31,6 @@ namespace GuiDemo {
             Trimming = StringTrimming.None,
             Alignment = StringAlignment.Near,
         };
-        TextRenderingHint _textRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
         public MainWindow() {
             InitializeComponent();
@@ -47,7 +46,7 @@ namespace GuiDemo {
             Load();
         }
 
-        private void Load() {
+        new private void Load() {
             _screen = new DynamicScreen((ClientSize.Width - _lineNumberWidth - (_border * 2)) / _charSize.Width);
             _screen.TabSpaces = 4;
             _vt100.Encoding = Encoding.UTF8;

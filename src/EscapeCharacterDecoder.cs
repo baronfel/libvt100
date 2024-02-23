@@ -5,7 +5,6 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace libvt100 {
     public abstract class EscapeCharacterDecoder : IDecoder {
@@ -282,7 +281,7 @@ namespace libvt100 {
             OnOutput(data);
         }
 
-        bool IDecoder.KeyPressed(Keys _modifiers, Keys _key) {
+        bool IDecoder.KeyPressed(ConsoleModifiers _modifiers, ConsoleKey _key) {
             return false;
         }
 
